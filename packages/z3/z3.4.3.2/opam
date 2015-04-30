@@ -1,0 +1,15 @@
+opam-version: "1"
+maintainer: "admin@eaasycrypt.info"
+
+authors: ["The Z3 Team"]
+license: "Microsoft Research License Agreement / Non-Commercial Use Only"
+homepage: "http://z3.codeplex.com/"
+
+patches: ["z3.patch"]
+
+build: [
+  ["python" "scripts/mk_make.py" "--prefix=%{prefix}%"]
+  [make "-C" "build"]
+  [make "-C" "build" "install"]
+]
+depends: [ ]

@@ -1,0 +1,7 @@
+opam-version: "1"
+maintainer: "admin@easycrypt.info"
+depends: [
+  "menhir"
+  "why3" {= "0.83-3"}
+  "yojson"
+]

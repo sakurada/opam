@@ -1,0 +1,45 @@
+opam-version: "1"
+maintainer: "Francois.Bobot@cea.fr"
+authors: [
+  "François Bobot"
+  "Jean-Christophe Filliâtre"
+  "Claude Marché"
+  "Guillaume Melquiond"
+  "Andrei Paskevich"
+]
+homepage: "http://why3.lri.fr/"
+license: "GNU Lesser General Public License version 2.1"
+doc: ["http://why3.lri.fr/#documentation"]
+tags: [
+  "deductive"
+  "program verification"
+  "formal specification"
+  "automated theorem prover"
+  "interactive theorem prover"
+]
+build: [
+  ["./configure" "--prefix" prefix "--sbindir=%{lib}%/why3/sbin" "--libexecdir=%{lib}%/why3/libexec" "--sysconfdir=%{lib}%/why3/etc" "--sharedstatedir=%{lib}%/why3/com" "--localstatedir=%{lib}%/why3/var" "--libdir=%{lib}%/why3/lib" "--includedir=%{lib}%/why3/include" "--datarootdir=%{lib}%/why3/share" "--disable-coq-tactic" "--disable-coq-libs" "--disable-pvs-libs" "--disable-ide" "--disable-bench"]
+  [make "opt" "byte"]
+  [make "install" "install-lib"]
+]
+build-doc: [
+  [make "stdlibdoc" "apidoc"]
+  [make "DOCDIR=%{doc}%/why3" "install-doc"]
+]
+remove: [
+  ["rm" "-f" "%{prefix}%/bin/why3"]
+  ["rm" "-f" "%{prefix}%/bin/why3config"]
+  ["rm" "-f" "%{prefix}%/bin/why3doc"]
+  ["rm" "-f" "%{prefix}%/bin/why3replayer"]
+  ["rm" "-f" "%{prefix}%/bin/why3session"]
+  ["rm" "-Rf" "%{prefix}%/lib/why3"]
+  ["rm" "-Rf" "%{prefix}%/share/why3"]
+]
+depends: [
+  "ocamlgraph" {>= "1.8.2"}
+]
+patches: [
+  "z3-driver.patch"
+  "alt-ergo-driver.patch"
+  "memoization.patch"
+]

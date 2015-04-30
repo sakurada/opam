@@ -1,0 +1,14 @@
+Only in why3.0.83: memoization.patch
+diff -ru why3.0.83.orig/src/core/trans.ml why3.0.83/src/core/trans.ml
+--- why3.0.83.orig/src/core/trans.ml	2014-03-14 16:01:03.000000000 +0100
++++ why3.0.83/src/core/trans.ml	2014-08-28 16:22:01.839557956 +0200
+@@ -47,7 +47,7 @@
+   let tag t = t.task_tag
+ end)
+ 
+-let store fn = let tr = Wtask.memoize_option 63 fn in fun t -> match t with
++let store fn = let tr = (* Wtask.memoize_option 63 *) fn in fun t -> match t with
+   | Some {task_decl = {td_node = Decl {d_node = Dprop (Pgoal,_,_)}}} -> fn t
+   | _ -> tr t
+ 
+Only in why3.0.83: z3-driver.patch

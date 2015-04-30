@@ -1,0 +1,42 @@
+diff -rNu eprover.1.7.orig/Makefile.vars eprover.1.7/Makefile.vars
+--- eprover.1.7.orig/Makefile.vars	2013-03-24 01:31:07.000000000 +0100
++++ eprover.1.7/Makefile.vars	2014-05-18 11:13:58.000000000 +0200
+@@ -129,17 +129,17 @@
+ # 
+ # Solaris/Linux with gcc
+ #
+-# CFLAGS     = -O6 -Wall -Wno-char-subscripts -Wshadow -ansi \
++# CFLAGS     = -O3 -Wall -Wno-char-subscripts -Wshadow -ansi \
+ #             -pedantic -I../include $(DEBUGFLAGS) \
+ #             $(BUILDFLAGS) $(ARCHFLAGS)
+ 
+-CFLAGS     = -O6 -fomit-frame-pointer -Wall -Wno-char-subscripts -std=gnu99 \
++CFLAGS     = -O3 -fomit-frame-pointer -Wall -Wno-char-subscripts -Wno-unused -std=gnu99 \
+              -I../include $(DEBUGFLAGS) \
+              $(BUILDFLAGS) $(ARCHFLAGS)
+ 
+ # Version for profiling
+ 
+-# CFLAGS     = -O6 -Wall -Wno-char-subscripts -ansi -std=gnu99 \
++# CFLAGS     = -O3 -Wall -Wno-char-subscripts -ansi -std=gnu99 \
+ #              -I../include $(DEBUGFLAGS) \
+ #              $(BUILDFLAGS) $(ARCHFLAGS)
+ 
+@@ -151,7 +151,7 @@
+ 
+ # Workaround for broken Red Hat gcc 2.96 (hah!)
+ 
+-# CFLAGS     = -O6 -fno-strength-reduce -Wall -Wno-char-subscripts -Wshadow -ansi \
++# CFLAGS     = -O3 -fno-strength-reduce -Wall -Wno-char-subscripts -Wshadow -ansi \
+ #             -pedantic -I../include $(DEBUGFLAGS) \
+ #             $(BUILDFLAGS) $(ARCHFLAGS)
+ #
+@@ -160,7 +160,7 @@
+ #
+ # HPUX with gcc - someone please hurt an HP employee for me!
+ #
+-# CFLAGS     = -O6 -Wall -Wno-char-subscripts -Wshadow \
++# CFLAGS     = -O3 -Wall -Wno-char-subscripts -Wshadow \
+ #             -I../include $(DEBUGFLAGS) \
+ #             $(BUILDFLAGS) $(ARCHFLAGS) -DHP_UX
+ 

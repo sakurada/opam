@@ -1,0 +1,632 @@
+diff -ru alt-ergo-0.95.2.orig/src/theories/arith.ml alt-ergo-0.95.2/src/theories/arith.ml
+--- alt-ergo-0.95.2.orig/src/theories/arith.ml	2013-09-20 10:04:39.000000000 +0200
++++ alt-ergo-0.95.2/src/theories/arith.ml	2014-09-01 15:07:12.054860725 +0200
+@@ -107,8 +107,8 @@
+         match P.is_const p2 with
+ 	  | Some n2 -> 
+ 	    let an2 = Q.abs n2 in
+-	    assert (Q.is_integer an2);
+-	    let t2 = T.int (Q.string_of an2) in
++	    assert (Q.is_int an2);
++	    let t2 = T.int (Q.to_string an2) in
+ 	    A.LT.make (A.Builtin(true, alt, [md; t2]))
+ 	  | None -> 
+ 	    A.LT.make (A.Builtin(true, alt, [md; t2])) 
+@@ -133,7 +133,7 @@
+       let {T.f = sb ; xs = xs; ty = ty} = T.view t in
+       match sb, xs with
+         | (Sy.Int n | Sy.Real n) , _  -> 
+-	  let c = Q.mult coef (Q.of_string (Hstring.view n)) in
++	  let c = Q.mult coef (Q.from_string (Hstring.view n)) in
+ 	  P.add (P.create [] c ty) p, ctx
+ 
+         | Sy.Op Sy.Mult, [t1;t2] ->
+@@ -303,7 +303,7 @@
+           if Q.compare m b <= 0 then m else assert false
+ 	    
+       in
+-      if Q.compare m (Q.div b (Q.of_int 2)) < 0 then m else Q.sub m b
++      if Q.compare m (Q.div b (Q.from_int 2)) < 0 then m else Q.sub m b
+ 
+     let mult_const p c =
+       P.mult p (P.create [] c (P.type_info p))
+@@ -409,7 +409,7 @@
+       let ppmc = P.ppmc_denominators p in
+       let p = mult_const p (Q.div ppmc pgcd)  in
+       let l, b = P.to_list p in
+-      if not (Q.is_integer b) then raise Exception.Unsolvable;
++      if not (Q.is_int b) then raise Exception.Unsolvable;
+       omega l b
+ 
+     let is_null p = 
+diff -ru alt-ergo-0.95.2.orig/src/theories/arrays.ml alt-ergo-0.95.2/src/theories/arrays.ml
+--- alt-ergo-0.95.2.orig/src/theories/arrays.ml	2013-09-20 10:04:39.000000000 +0200
++++ alt-ergo-0.95.2/src/theories/arrays.ml	2014-09-01 15:07:16.494860651 +0200
+@@ -391,7 +391,7 @@
+       try
+         let a = LRset.choose env.split in
+         Debug.case_split a;
+-        [LR.view a, Ex.empty, Numbers.Q.of_int 2] 
++        [LR.view a, Ex.empty, Numbers.Q.from_int 2] 
+       with Not_found ->
+         Debug.case_split_none ();
+ 	[]
+diff -ru alt-ergo-0.95.2.orig/src/theories/cc.ml alt-ergo-0.95.2/src/theories/cc.ml
+--- alt-ergo-0.95.2.orig/src/theories/cc.ml	2013-09-20 10:04:39.000000000 +0200
++++ alt-ergo-0.95.2/src/theories/cc.ml	2014-09-01 15:09:31.798858401 +0200
+@@ -283,6 +283,14 @@
+ 	          
+ 	        (* we update use *)
+ 	          let nuse = Use.up_close_up env.use p v in
++	          let nuse =
++	            List.fold_left
++	              (fun nuse (r, rr, ex) ->
++	                match X.leaves rr with
++	                | _ :: _ -> nuse
++	                | []     -> Use.up_close_up nuse p one
++	              )nuse touched
++	          in
+ 	          Use.print nuse;
+ 	          
+ 	        (* we check the congruence of the terms. *)
+@@ -453,7 +461,7 @@
+ 
+     let split_size sz = 
+       if debug_split () then
+-	fprintf fmt ">size case-split: %s@." (Numbers.Q.string_of sz)
++	fprintf fmt ">size case-split: %s@." (Numbers.Q.to_string sz)
+ 
+     let split_backtrack neg_c ex_c = 
+       if debug_split () then
+diff -ru alt-ergo-0.95.2.orig/src/theories/fm.ml alt-ergo-0.95.2/src/theories/fm.ml
+--- alt-ergo-0.95.2.orig/src/theories/fm.ml	2013-09-20 10:04:39.000000000 +0200
++++ alt-ergo-0.95.2/src/theories/fm.ml	2014-09-01 15:06:29.134861438 +0200
+@@ -392,7 +392,7 @@
+ 
+     let find_one_eq x u =
+       match I.is_point u with
+-        | Some (v, ex) when X.type_info x <> Ty.Tint || Q.is_integer v ->
++        | Some (v, ex) when X.type_info x <> Ty.Tint || Q.is_int v ->
+           let eq = 
+ 	    L.Eq (x,(P.alien_of (P.create [] v (X.type_info x)))) in
+ 	  Some (eq, None, ex)
+@@ -585,8 +585,8 @@
+       try
+         if ty = Ty.Tint then
+           (* my_gcd instead of gcd bog_int *)
+-	  let p = Z.my_gcd (Q.z_of a) (Q.z_of b) in
+-	  let p = Q.of_z p in
++	  let p = Z.my_gcd (Q.to_z a) (Q.to_z b) in
++	  let p = Q.from_z p in
+ 	  Q.div a p, Q.div b p
+         else a, b
+       with Failure "big_int_of_ratio" -> a, b
+diff -ru alt-ergo-0.95.2.orig/src/theories/intervals.ml alt-ergo-0.95.2/src/theories/intervals.ml
+--- alt-ergo-0.95.2.orig/src/theories/intervals.ml	2013-09-20 10:04:39.000000000 +0200
++++ alt-ergo-0.95.2/src/theories/intervals.ml	2014-09-01 15:12:47.334855151 +0200
+@@ -100,8 +100,8 @@
+     | Pinfty -> fprintf fmt "%s" (if pretty then "+∞" else "+inf")
+     | Strict (v, e) | Large (v, e) ->
+       if verbose () || proof () then 
+-        fprintf fmt "%s %a" (Q.string_of v) Ex.print e
+-      else fprintf fmt "%s" (Q.string_of v)
++        fprintf fmt "%s %a" (Q.to_string v) Ex.print e
++      else fprintf fmt "%s" (Q.to_string v)
+         
+   let print_interval pretty fmt (b1,b2) =
+     let c1, c2 = match b1, b2 with
+@@ -183,7 +183,7 @@
+ 	(EmptyInterval (Ex.union e2 e1));
+       if c = 0 then begin
+ 	match b1, b2 with
+-	  | Large _, Large _ when not is_int || Q.is_integer v1 ->
++	  | Large _, Large _ when not is_int || Q.is_int v1 ->
+ 	    ()
+ 	  | _ -> raise (EmptyInterval (Ex.union e2 e1))
+       end
+@@ -341,6 +341,9 @@
+       then b
+       else if pos_borne b then Pinfty
+       else Minfty
++    | Strict (_, e1), Large (v, e2)
++    | Large (v, e1), Strict (_, e2) when Q.is_zero v ->
++      Large (Q.zero, Ex.union e1 e2)
+     | Strict (v1, e1), Strict (v2, e2) | Strict (v1, e1), Large (v2, e2)
+     | Large (v1, e1), Strict (v2, e2) -> 
+       Strict (Q.mult v1 v2, Ex.union e1 e2)
+@@ -577,13 +580,13 @@
+   if Q.sign a < 0 then assert false
+   else if Q.sign a = 0 then Q.zero
+   else
+-    let v = Q.float_of a in
++    let v = Q.to_float a in
+     let w = if v < min_float then min_float
+       else if v > max_float then max_float
+       else v
+     in
+-    if n = 2 then Q.of_float (sqrt w)
+-    else Q.of_float (w ** (1./. (float n)))
++    if n = 2 then Q.from_float (sqrt w)
++    else Q.from_float (w ** (1./. (float n)))
+ 
+ let root_default_num a n =
+   let s = root_num a n in
+diff -ru alt-ergo-0.95.2.orig/src/theories/polynome.ml alt-ergo-0.95.2/src/theories/polynome.ml
+--- alt-ergo-0.95.2.orig/src/theories/polynome.ml	2013-09-20 10:04:39.000000000 +0200
++++ alt-ergo-0.95.2/src/theories/polynome.ml	2014-09-01 15:05:19.338862598 +0200
+@@ -122,15 +122,15 @@
+             else if Q.equal n Q.m_one then "-", "", ""
+             else
+               if Q.sign n > 0 then 
+-	        (if !zero then "" else "+"), Q.string_of n, "*" 
+-              else "-", Q.string_of (Q.minus n), "*" 
++	        (if !zero then "" else "+"), Q.to_string n, "*" 
++              else "-", Q.to_string (Q.minus n), "*" 
+           in
+ 	  zero := false;
+           fprintf fmt "%s%s%s%a" s n op X.print x
+         ) p.m;
+       let s, n = 
+-        if Q.sign p.c > 0 then (if !zero then "" else "+"), Q.string_of p.c 
+-        else if Q.sign p.c < 0 then "-", Q.string_of (Q.minus p.c)
++        if Q.sign p.c > 0 then (if !zero then "" else "+"), Q.to_string p.c 
++        else if Q.sign p.c < 0 then "-", Q.to_string (Q.minus p.c)
+         else (if !zero then "","0" else "","") in
+       fprintf fmt "%s%s" s n
+ 
+@@ -138,8 +138,8 @@
+       if Options.term_like_pp () then pprint fmt p 
+       else begin
+         M.iter 
+-          (fun t n -> fprintf fmt "%s*%a " (Q.string_of n) X.print t) p.m;
+-        fprintf fmt "%s" (Q.string_of p.c);
++          (fun t n -> fprintf fmt "%s*%a " (Q.to_string n) X.print t) p.m;
++        fprintf fmt "%s" (Q.to_string p.c);
+         fprintf fmt " [%a]" Ty.print p.ty
+       end
+   end
+@@ -255,17 +255,17 @@
+   let ppmc_denominators {m=m} = 
+     let res =   
+       M.fold
+-        (fun k c acc -> Z.my_lcm (Q.denominator c) acc)
++        (fun k c acc -> Z.my_lcm (Q.den c) acc)
+         m Z.one in
+-    Q.abs (Q.of_z res)
++    Q.abs (Q.from_z res)
+ 
+   let pgcd_numerators {m=m} = 
+     let res =   
+       M.fold
+-        (fun k c acc -> Z.my_gcd (Q.numerator c) acc)
++        (fun k c acc -> Z.my_gcd (Q.num c) acc)
+         m Z.zero
+     in
+-    Q.abs (Q.of_z res)
++    Q.abs (Q.from_z res)
+ 
+   let normal_form ({ m = m; c = c } as p) =
+     if M.is_empty m then 
+diff -ru alt-ergo-0.95.2.orig/src/theories/sum.ml alt-ergo-0.95.2/src/theories/sum.ml
+--- alt-ergo-0.95.2.orig/src/theories/sum.ml	2013-09-20 10:04:39.000000000 +0200
++++ alt-ergo-0.95.2/src/theories/sum.ml	2014-09-01 15:07:30.486860418 +0200
+@@ -324,7 +324,7 @@
+         | Some (n,r,hs) -> 
+ 	  let r' = is_mine (Cons(hs,X.type_info r)) in
+           Debug.case_split r r';
+-	  [A.Eq(r, r'), Ex.empty, Numbers.Q.of_int n]
++	  [A.Eq(r, r'), Ex.empty, Numbers.Q.from_int n]
+         | None -> 
+           Debug.no_case_split ();
+ 	  []
+diff -ru alt-ergo-0.95.2.orig/src/theories/use.ml alt-ergo-0.95.2/src/theories/use.ml
+--- alt-ergo-0.95.2.orig/src/theories/use.ml	2013-09-20 10:04:39.000000000 +0200
++++ alt-ergo-0.95.2/src/theories/use.ml	2014-09-01 15:15:29.026852463 +0200
+@@ -54,8 +54,8 @@
+     Options.exec_thread_yield (); ST.inter x1 x2, SA.inter y1 y2
+   let union_tpl (x1,y1) (x2,y2) = 
+     Options.exec_thread_yield (); ST.union x1 x2, SA.union y1 y2
++  let one, _ = X.make (T.make (Symbols.name "@bottom") [] Ty.Tint)
+   let leaves r = 
+-    let one, _ = X.make (T.make (Symbols.name "@bottom") [] Ty.Tint) in
+     match X.leaves r with [] -> [one] | l -> l
+ 
+   module G = Map.Make(struct type t = X.r include X end)
+diff -ru alt-ergo-0.95.2.orig/src/util/numbers.ml alt-ergo-0.95.2/src/util/numbers.ml
+--- alt-ergo-0.95.2.orig/src/util/numbers.ml	2013-09-20 10:04:39.000000000 +0200
++++ alt-ergo-0.95.2/src/util/numbers.ml	2014-09-01 15:03:34.770864337 +0200
+@@ -14,146 +14,117 @@
+ (*   This file is distributed under the terms of the CeCILL-C licence         *)
+ (******************************************************************************)
+ 
+-module Z1 = struct
+-  include Big_int
+ 
+-  type t = big_int
++(** Integers implementation. Based on Zarith's integers **)
++module Z = struct
+ 
+-  let zero = zero_big_int
+-  let one = unit_big_int
+-  let my_gcd a b = gcd_big_int a b
+-  let my_lcm a b = div_big_int (mult_big_int a b) (my_gcd a b)
+-  let of_string = big_int_of_string
++  type t = Z.t
+ 
++  let zero           = Z.zero
++  let one            = Z.one
++  let m_one          = Z.minus_one
++
++  let compare a b    = Z.compare a b
++  let compare_to_0 t = Z.sign t
++  let equal   a b    = Z.equal a b
++  let sign t         = Z.sign t
++  let hash t         = Z.hash t
++
++  let is_zero t      = compare_to_0 t = 0
++  let is_one  t      = equal t one
++  let is_m_one t     = equal t m_one
++    
++  let add a b     = Z.add a b
++  let sub a b     = Z.sub a b
++  let mult a b    = Z.mul a b
++  let div a b     = Z.div a b
++  let rem a b     = Z.rem a b
++  let div_rem a b = Z.div_rem a b
++  let minus t     = Z.neg t
++  let abs t       = Z.abs t
++
++  let from_int n    = Z.of_int n
++  let from_string s = Z.of_string s
++  let to_string t   = Z.to_string t
++  let print fmt z   = Format.fprintf fmt "%s" (to_string z)
++
++  let my_gcd a b =
++    if is_zero a then b
++    else if is_zero b then a
++    else Z.gcd a b
++
++  let my_lcm a b = 
++    try 
++      let res1 = Z.lcm a b in
++      assert (equal res1 (div (mult a b) (my_gcd a b)));
++      res1
++    with Division_by_zero -> assert false
++
++  (* These functuons are not exported, but they are used by module Q below *)
++  let to_float z = Z.to_float z
++  let fdiv z1 z2 = Z.fdiv z1 z2
++  let cdiv z1 z2 = Z.cdiv z1 z2
++  let pow z n    = Z.pow z n
++    
+ end
+ 
+-module Q1 = struct
+ 
+-  exception Not_a_float
+-
+-  include Num
+-
+-  type t = num
+-
+-  let zero = Int 0
+-  let one = Int 1
+-  let m_one = Int (-1)
+-  let of_int n = Int n
+-
+-  let ceiling = ceiling_num
+-  let floor = floor_num
+-  let is_integer = is_integer_num
+-  let abs = abs_num
+-
+-  let power a n =
+-    if n = 0 then one (* 0 ^ 0 = 1, undefined in mathematics*)
+-    else match a with
+-      | Int 1 -> one
+-      | Int 0 -> zero
+-      | Int (-1) ->
+-        if n mod 2 = 0 then one else m_one
+-      | _ -> power_num a (Int n)
+-
+-  let modulo = mod_num
+-  let div = div_num
+-  let mult = mult_num
+-  let sub = sub_num
+-  let add = add_num
+-  let minus = minus_num
+-  let sign = sign_num
+-  let compare = compare_num
+-  let equal a b = a =/ b
+-
+-  let string_of = string_of_num
+-  let of_string = num_of_string
+-  let float_of = float_of_num
+-  let z_of = big_int_of_num
+-  let of_z  = num_of_big_int
+-
+-  let denominator = function 
+-    | Int _ | Big_int _ -> Big_int.unit_big_int
+-    | Ratio rat -> Ratio.denominator_ratio rat
+-
+-  let numerator = function
+-    | Int i -> Big_int.big_int_of_int i
+-    | Big_int b -> b
+-    | Ratio rat -> Ratio.numerator_ratio rat
+-
+-  let of_float x =
+-    if x = infinity || x = neg_infinity then raise Not_a_float;
+-    let (f, n) = frexp x in
+-    let z =
+-      Big_int.big_int_of_string
+-        (Int64.to_string (Int64.of_float (f *. 2. ** 52.))) in
+-    let factor = power (of_int 2) (n - 52) in
+-    mult (of_z z) factor
+-
+-
+-(********
+-  comparer avec l'implem de Alain de of_float
+-  let ratio_of_float f =
+-    Ratio.ratio_of_string (string_of_float f)
+-      
+-  let num_of_float f = num_of_ratio (ratio_of_float f)
+-
+-  let of_float x = 
+-    let res = of_float x in
+-    let z = num_of_float x in
+-    assert (res =/ z);
+-    res
+-********)
+-end
+-
+-(******************************************************************************)
+-
+-module Z2 = struct
+-
+-  include Z
+-
+-  let my_gcd a b = 
+-    if sign a = 0 then b
+-    else if sign b = 0 then a
+-    else gcd a b
+-
+-  let my_lcm a b = div (mul a b) (gcd a b)
+-
+-end
+-
+-module Q2 = struct
++(** Rationals implementation. Based on Zarith's rationals **)
++module Q = struct
+ 
+   exception Not_a_float
+-  include Q
+-
+-  let m_one = neg one
+-  let minus = neg
+-  let mult = mul
+-  let numerator = num
+-  let denominator = den
+-
+-  let of_z z = make z Z2.one
+-  let z_of = num
+-
+-  let string_of = to_string
++    
++  type t = Q.t
+ 
+-  let is_integer t = Z2.equal Z2.one (den t)
+-
+-  let ceiling a = of_z (Z2.cdiv a.num a.den)
+-
+-  let floor a = of_z (Z2.fdiv a.num a.den)
++  let num t  = Q.num t
++  let den t  = Q.den t
+ 
++  let zero   = Q.zero
++  let one    = Q.one
++  let m_one  = Q.minus_one
++  let inf    = Q.inf
++
++  let compare t1 t2  = Q.compare t1 t2
++  let compare_to_0 t = Q.sign t
++  let equal t1 t2    = Q.equal t1 t2
++  let sign t         = Q.sign t
++  let hash t         = 13 * Z.hash (num t) + 23 * Z.hash (den t) 
++
++  let is_zero t  = compare_to_0 t = 0
++  let is_one  t  = equal t one
++  let is_m_one t = equal t m_one
++  let is_int t   = Z.is_one (den t)
++
++  let add t1 t2  = Q.add t1 t2
++  let sub t1 t2  = Q.sub t1 t2
++  let mult t1 t2 = Q.mul t1 t2
++  let div t1 t2  = Q.div t1 t2
++  let minus t    = Q.neg t
++  let abs t      = Q.abs t
++  let min t1 t2  = Q.min t1 t2
++
++  let inv t      =
++    if Z.is_zero (num t) then raise Division_by_zero;
++    Q.inv t
++
++  let from_int n    = Q.of_int n
++  let from_z z      = Q.make z Z.one
++  let from_zz z1 z2 = Q.make z1 z2
++  let from_string s = Q.of_string s
++  let from_float f  = 
++    if f = infinity || f = neg_infinity then raise Not_a_float;  
++    Q.of_float f
++
++  let to_string t = Q.to_string t
++  let to_z q      = assert (is_int q); num q
++  let to_float t  = (Z.to_float (num t)) /. (Z.to_float (den t))
++  let print fmt q = Format.fprintf fmt "%s" (to_string q)
++
++  let floor t      = from_z (Z.fdiv (num t) (den t))
++  let ceiling t    = from_z (Z.cdiv (num t) (den t))
++  let power t n    = from_zz (Z.pow (num t) n) (Z.pow (den t) n)
+   let modulo t1 t2 = 
+-    assert (is_integer t1 && is_integer t2);
+-    {Q.num=Z2.rem t1.num t2.num; den = Z2.one}
+-
+-  let power t n = make (Z2.pow t.num n) (Z2.pow t.den n)
+-
+-  let float_of t = (Z2.to_float t.num) /. (Z2.to_float t.den)
++    assert (is_int t1 && is_int t2);
++    from_zz (Z.rem (num t1) (num t2)) Z.one
+ 
+ end
+-
+-(* XXX : 
+-   surprisingly, Z2 and Q2 (based on zarith) are not faster than 
+-   Z1 and Q1 (based on Nums)
+-*)
+-module Z = Z1
+-module Q = Q1
+diff -ru alt-ergo-0.95.2.orig/src/util/numbers.mli alt-ergo-0.95.2/src/util/numbers.mli
+--- alt-ergo-0.95.2.orig/src/util/numbers.mli	2013-09-20 10:04:39.000000000 +0200
++++ alt-ergo-0.95.2/src/util/numbers.mli	2014-09-01 15:03:34.770864337 +0200
+@@ -14,50 +14,91 @@
+ (*   This file is distributed under the terms of the CeCILL-C licence         *)
+ (******************************************************************************)
+ 
++(** Integers implementation. Based on Zarith's integers **)
+ module Z : sig
+-
+   type t
+-
+-  val zero : t
++  val zero : t 
+   val one : t
++  val m_one : t (* minus one *)
+ 
++  val compare : t -> t -> int
++  val compare_to_0 : t -> int
++  val equal   : t -> t -> bool
++  val sign : t -> int
++  val hash : t -> int
++
++  val is_zero : t -> bool
++  val is_one : t -> bool
++  val is_m_one : t -> bool
++
++  val add : t -> t -> t
++  val sub : t -> t -> t
++  val mult : t -> t -> t
++  val div : t -> t -> t
++  val rem : t -> t -> t
++  val div_rem : t -> t -> t * t
++  val minus : t -> t
++  val abs  : t -> t
+   val my_gcd : t -> t -> t
+   val my_lcm : t -> t -> t
+-  val of_string : string -> t
+-
++  
++  val from_int : int -> t
++  val from_string : string -> t
++  val to_string : t -> string
++  val print : Format.formatter -> t -> unit
+ end
+ 
++
++(** Rationals implementation. Based on Zarith's rationals **)
+ module Q : sig
+ 
++  type t
++
+   exception Not_a_float
+ 
+-  type t
++  val num : t -> Z.t
++  val den : t -> Z.t
+ 
+-  val zero : t
++  val zero : t 
+   val one : t
+-  val m_one : t
+-  val of_int : int -> t
++  val m_one : t (* minus one *)
++  val inf : t
++
+   val compare : t -> t -> int
+-  val equal : t -> t -> bool
++  val compare_to_0 : t -> int
++  val equal   : t -> t -> bool
+   val sign : t -> int
+-  val minus : t -> t
++  val hash : t -> int
++
++  val is_zero : t -> bool
++  val is_one : t -> bool
++  val is_m_one : t -> bool
++  val is_int : t -> bool
++
+   val add : t -> t -> t
+   val sub : t -> t -> t
+   val mult : t -> t -> t
+   val div : t -> t -> t
+-  val modulo : t -> t -> t (* Euclidean division's remainder *)
+-  val power : t -> int -> t
++  val minus : t -> t
+   val abs : t -> t
+-  val is_integer : t -> bool
++  val min : t -> t -> t
++  val inv : t -> t
++  (* Euclidean division's remainder. Assumes that the arguments are in Z *)
++  val modulo : t -> t -> t 
++
++  val from_float : float -> t
++  val from_int : int -> t
++  val from_z : Z.t -> t
++  val from_zz: Z.t -> Z.t -> t
++  val from_string : string -> t
++  val to_float : t -> float
++  val to_z : t -> Z.t (* Assumes that the argument is in Z *)
++  val to_string : t -> string
++
++  val print : Format.formatter -> t -> unit
++
++  val power : t -> int -> t
+   val floor : t -> t
+   val ceiling : t -> t
+-  val of_string : string -> t
+-  val string_of : t -> string
+-  val of_z : Z.t -> t
+-  val z_of : t -> Z.t
+-  val float_of : t -> float
+-  val of_float : float -> t
+-  val denominator : t -> Z.t
+-  val numerator : t -> Z.t
+ 
+ end
+diff -ru alt-ergo-0.95.2.orig/src/util/options.ml alt-ergo-0.95.2/src/util/options.ml
+--- alt-ergo-0.95.2.orig/src/util/options.ml	2013-09-20 10:04:39.000000000 +0200
++++ alt-ergo-0.95.2/src/util/options.ml	2014-09-01 15:04:26.162863482 +0200
+@@ -67,7 +67,7 @@
+   let proof = ref false
+   let debug_proof = ref false
+   let rules = ref (-1)
+-  let max_split = ref (Numbers.Q.of_int 1000000)
++  let max_split = ref (Numbers.Q.from_int 1000000)
+   let restricted = ref false
+   let bottom_classes = ref false
+   let timelimit = ref 0.
+@@ -78,7 +78,7 @@
+ 
+   let set_max_split s = 
+     max_split := 
+-      try Numbers.Q.of_string s 
++      try Numbers.Q.from_string s 
+       with Failure _ -> Numbers.Q.m_one
+ 
+   let set_proof b = proof := b
+@@ -157,7 +157,7 @@
+     "-rules", Arg.String set_rules, "<parsing|typing|sat|cc|arith> output rules used on stderr";
+     "-max-split", Arg.String set_max_split,
+     (Format.sprintf " maximum size of case-split (default value : %s)" 
+-       (Numbers.Q.string_of !max_split));
++       (Numbers.Q.to_string !max_split));
+     "-restricted", Arg.Set restricted, 
+     " restrict set of decision procedures (equality, arithmetic and AC)";
+     "-bottom-classes", Arg.Set bottom_classes, "show equivalence classes at each bottom of the sat";

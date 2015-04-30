@@ -1,0 +1,60 @@
+diff -rNu eprover.1.7.orig/BASICS/clb_avlgeneric.h eprover.1.7/BASICS/clb_avlgeneric.h
+--- eprover.1.7.orig/BASICS/clb_avlgeneric.h	2012-07-02 16:38:08.000000000 +0200
++++ eprover.1.7/BASICS/clb_avlgeneric.h	2014-05-18 18:52:28.000000000 +0200
+@@ -25,7 +25,7 @@
+ 
+ -----------------------------------------------------------------------*/
+ 
+-#ifndef CLB_AVLGENRIC
++#ifndef CLB_AVLGENERIC
+ 
+ #define CLB_AVLGENERIC
+ 
+diff -rNu eprover.1.7.orig/CONTROL/cco_simplification.h eprover.1.7/CONTROL/cco_simplification.h
+--- eprover.1.7.orig/CONTROL/cco_simplification.h	2012-07-02 16:38:08.000000000 +0200
++++ eprover.1.7/CONTROL/cco_simplification.h	2014-05-18 18:53:00.000000000 +0200
+@@ -23,7 +23,7 @@
+ 
+ #ifndef CCO_SIMPLIFICATION
+ 
+-#define CCI_SIMPIFICATION
++#define CCO_SIMPLIFICATION
+ 
+ 
+ #include <che_proofcontrol.h>
+diff -rNu eprover.1.7.orig/HEURISTICS/che_lifo.h eprover.1.7/HEURISTICS/che_lifo.h
+--- eprover.1.7.orig/HEURISTICS/che_lifo.h	2012-07-02 16:38:08.000000000 +0200
++++ eprover.1.7/HEURISTICS/che_lifo.h	2014-05-18 18:52:02.000000000 +0200
+@@ -23,7 +23,7 @@
+ 
+ #ifndef CHE_LIFO
+ 
+-#define CHE_LFIFO
++#define CHE_LIFO
+ 
+ #include <che_wfcb.h>
+ 
+diff -rNu eprover.1.7.orig/LEARN/cle_classification.h eprover.1.7/LEARN/cle_classification.h
+--- eprover.1.7.orig/LEARN/cle_classification.h	2012-07-02 16:38:08.000000000 +0200
++++ eprover.1.7/LEARN/cle_classification.h	2014-05-18 18:52:11.000000000 +0200
+@@ -21,7 +21,7 @@
+ 
+ -----------------------------------------------------------------------*/
+ 
+-#ifndef CLE_CLASSSIFICATION
++#ifndef CLE_CLASSIFICATION
+ 
+ #define CLE_CLASSIFICATION
+ 
+diff -rNu eprover.1.7.orig/LEARN/cle_termtops.h eprover.1.7/LEARN/cle_termtops.h
+--- eprover.1.7.orig/LEARN/cle_termtops.h	2012-07-02 16:38:09.000000000 +0200
++++ eprover.1.7/LEARN/cle_termtops.h	2014-05-18 18:52:45.000000000 +0200
+@@ -21,7 +21,7 @@
+ 
+ -----------------------------------------------------------------------*/
+ 
+-#ifndef CLE_TERMOPS
++#ifndef CLE_TERMTOPS
+ 
+ #define CLE_TERMTOPS
+ 

@@ -1,0 +1,13 @@
+opam-version: "1"
+maintainer: "admin@eaasycrypt.info"
+
+authors: ["Kshitij Bansal" "Clark Barrett" "Francois Bobot" "Christopher Conway" "Morgan Deters" "Liana Hadarean" "Dejan Jovanovic" "Tim King" "Tianyi Liang" "Andrew Reynolds" "Cesare Tinelli"]
+license: "BSD-like"
+homepage: "http://cvc4.cs.nyu.edu/web/"
+
+build: [
+  ["./configure" "--prefix=%{prefix}%"]
+  [make]
+  [make "install"]
+]
+depends: [ ]

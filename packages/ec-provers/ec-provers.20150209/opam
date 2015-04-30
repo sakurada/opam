@@ -1,0 +1,7 @@
+opam-version: "1"
+maintainer: "admin@easycrypt.info"
+depends: [
+  "eprover" {= "1.7"}
+  "alt-ergo" {= "0.99.1.20150209"}
+  "z3" {= "4.3.2"}
+]

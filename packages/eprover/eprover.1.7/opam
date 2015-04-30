@@ -1,0 +1,17 @@
+opam-version: "1"
+maintainer: "admin@eaasycrypt.info"
+
+authors: ["Stephan Schulz"]
+license: "GPL-2"
+homepage: "http://www4.informatik.tu-muenchen.de/~schulz/E/E.html"
+
+build: [
+  ["./configure" "--prefix=%{prefix}%"]
+  [make]
+  [make "install"]
+]
+depends: [ ]
+patches: [
+  "Makefile.patch"
+  "header-guards.patch"
+]

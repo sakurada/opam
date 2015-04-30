@@ -1,0 +1,12 @@
+diff -rNu alt-ergo-0.95.2.orig/Makefile.in alt-ergo-0.95.2/Makefile.in
+--- alt-ergo-0.95.2.orig/Makefile.in	2013-09-20 10:04:39.000000000 +0200
++++ alt-ergo-0.95.2/Makefile.in	2014-09-01 15:40:32.598827467 +0200
+@@ -234,7 +234,7 @@
+ 
+ 
+ 
+-VERSION=0.95.2
++VERSION=0.95.2.20140901
+ 
+ #We use the filename of a file in order to create a depency between version.ml
+ #and the result of ./revision.sh

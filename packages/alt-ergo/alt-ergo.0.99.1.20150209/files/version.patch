@@ -1,0 +1,11 @@
+diff -ru alt-ergo-0.99.1.orig/Makefile.users alt-ergo-0.99.1/Makefile.users
+--- alt-ergo-0.99.1.orig/Makefile.users	2014-12-30 12:12:49.000000000 +0100
++++ alt-ergo-0.99.1/Makefile.users	2015-02-09 14:13:05.825101720 +0100
+@@ -1,6 +1,6 @@
+ ARCH = $(shell uname -m)
+ 
+-VERSION=0.99.1
++VERSION=0.99.1.20150209
+ 
+ LOCAL_INC = -I src/util -I src/structures -I src/theories -I src/instances \
+     -I src/sat -I src/preprocess -I src/parsing -I src/gui -I src/main \
