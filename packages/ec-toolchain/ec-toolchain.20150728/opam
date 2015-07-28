@@ -1,0 +1,9 @@
+opam-version: "1"
+maintainer: "admin@easycrypt.info"
+depends: [
+  "menhir"
+  "why3" {= "0.85-1"}
+  "batteries" {>= "2.3"}
+  "zarith"
+  "pcre" {>= "7"}
+]
