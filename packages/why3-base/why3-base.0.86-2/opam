@@ -1,0 +1,50 @@
+opam-version: "1.2"
+maintainer: "Claude.Marche@inria.fr"
+authors: [
+  "François Bobot"
+  "Jean-Christophe Filliâtre"
+  "Claude Marché"
+  "Guillaume Melquiond"
+  "Andrei Paskevich"
+]
+homepage: "http://why3.lri.fr/"
+license: "GNU Lesser General Public License version 2.1"
+doc: "http://why3.lri.fr/#documentation"
+tags: [
+  "deductive"
+  "program verification"
+  "formal specification"
+  "automated theorem prover"
+  "interactive theorem prover"
+]
+build: [
+  [
+    "./configure"
+    "--prefix"
+    prefix
+    "--disable-frama-c"
+    "--disable-ide" {!conf-gtksourceview:installed}
+  ]
+  [make "opt" "byte"]
+  [make "install" "install-lib"]
+]
+build-doc: [
+  [make "doc" "stdlibdoc" "apidoc"]
+  [make "DOCDIR=%{doc}%/why3" "install-doc"]
+]
+depends: ["ocamlfind" "menhir" "zarith"]
+depopts: [
+  "lablgtk" "conf-gtksourceview" "camlzip" "ocamlgraph" "coq"
+]
+conflicts: [
+  "lablgtk" {< "2.14.2"}
+  "ocamlgraph" {< "1.8.2"}
+  "coq" {< "8.4"}
+  "why3" {!= "0.86-1"}
+]
+available: [ocaml-version >= "4.01.0"]
+patches: [
+  "alt-ergo-driver.patch"
+  "memoization.patch"
+  "menhir-clash.patch"
+]

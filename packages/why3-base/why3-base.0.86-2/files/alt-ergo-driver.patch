@@ -1,0 +1,11 @@
+diff -rNu why3-0.86.1.orig/share/provers-detection-data.conf why3-0.86.1/share/provers-detection-data.conf
+--- why3-0.86.1.orig/share/provers-detection-data.conf	2015-05-21 10:51:40.000000000 +0200
++++ why3-0.86.1/share/provers-detection-data.conf	2015-08-10 15:21:21.052507443 +0200
+@@ -8,6 +8,7 @@
+ version_regexp = "^\\([0-9.]+\\(-dev\\|prv\\)?\\)$"
+ version_ok  = "1.00.prv"
+ version_ok  = "0.99.1"
++version_ok  = "0.99.1.20150209"
+ version_ok  = "0.95.2"
+ # %T means timelimit+1
+ command = "%l/why3-cpulimit %T %m -s %e -timelimit %t %f"
