@@ -11,8 +11,8 @@ remove: [
   [make "PREFIX=%{prefix}%" "uninstall"]
 ]
 depends: [
-  "ec-toolchain"
+  "ec-toolchain" {= "20150923"}
 ]
 depopts: [
-  "ec-provers"
+  "ec-provers" {>= "20150209"}
 ]
