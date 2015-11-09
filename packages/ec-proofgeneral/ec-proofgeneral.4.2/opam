@@ -1,0 +1,27 @@
+opam-version: "1.1"
+maintainer: "pierre-yves@strub.nu"
+homepage: "https://www.easycrypt.info/"
+bug-reports: "https://www.easycrypt.info/trac/newticket"
+build: [
+  ["mkdir" "easycrypt"]
+  ["ln" "-s" "%{prefix}%/share/easycrypt/emacs/easycrypt-abbrev.el" "easycrypt"]
+  ["ln" "-s" "%{prefix}%/share/easycrypt/emacs/easycrypt-hooks.el" "easycrypt"]
+  ["ln" "-s" "%{prefix}%/share/easycrypt/emacs/easycrypt-keywords.el" "easycrypt"]
+  ["ln" "-s" "%{prefix}%/share/easycrypt/emacs/easycrypt-syntax.el" "easycrypt"]
+  ["ln" "-s" "%{prefix}%/share/easycrypt/emacs/easycrypt.el" "easycrypt"]
+  [make "clean"]
+]
+install: [
+  ["mkdir" "%{prefix}%/share/ec-proofgeneral"]
+  ["cp" "-R" "." "%{prefix}%/share/ec-proofgeneral/"]
+]
+remove: [
+  ["rm" "-R" "%{prefix}%/share/ec-proofgeneral/"]
+]
+depends: [
+  "easycrypt"
+]
+patches: [
+  "pg-4.2.patch"
+  "proof-site.patch"
+]
