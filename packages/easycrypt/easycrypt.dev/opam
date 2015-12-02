@@ -8,7 +8,7 @@ build: [
   [make "PREFIX=%{prefix}%" "install"]
 ]
 remove: [
-  [make "PREFIX=%{prefix}%" "uninstall"]
+  [make "PREFIX=%{prefix}%" "uninstall-purge"]
 ]
 depends: [
   "ec-toolchain" {= "20150923"}
