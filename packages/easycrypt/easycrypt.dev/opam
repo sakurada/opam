@@ -12,6 +12,7 @@ remove: [
 ]
 depends: [
   "ec-toolchain" {= "20150923"}
+  "ocamlbuild"
 ]
 depopts: [
   "ec-provers" {>= "20150209"}
