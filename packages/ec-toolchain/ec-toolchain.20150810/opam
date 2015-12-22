@@ -1,7 +1,7 @@
 opam-version: "1"
 maintainer: "admin@easycrypt.info"
 depends: [
-  "menhir"
+  "menhir" {= "20141215"}
   "why3-base" {= "0.86-1"}
   "batteries" {>= "2.3"}
   "zarith"
