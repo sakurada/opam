@@ -1,0 +1,10 @@
+opam-version: "1"
+maintainer: "admin@easycrypt.info"
+depends: [
+  "batteries" {>= "2.3"}
+  "camlzip"
+  "menhir" {>= "20150921"}
+  "pcre" {>= "7"}
+  "why3-base" {= "0.86-2"}
+  "zarith"
+]
