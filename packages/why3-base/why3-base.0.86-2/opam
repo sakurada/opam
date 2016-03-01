@@ -23,7 +23,7 @@ build: [
     "--prefix"
     prefix
     "--disable-frama-c"
-    "--disable-coq"
+    "--disable-coq-tactic"
     "--disable-ide" {!conf-gtksourceview:installed}
   ]
   [make "opt" "byte"]
