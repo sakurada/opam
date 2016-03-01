@@ -23,6 +23,7 @@ build: [
     "--prefix"
     prefix
     "--disable-frama-c"
+    "--disable-coq"
     "--disable-ide" {!conf-gtksourceview:installed}
   ]
   [make "opt" "byte"]
@@ -34,7 +35,7 @@ build-doc: [
 ]
 depends: ["ocamlfind" "menhir" "zarith"]
 depopts: [
-  "lablgtk" "conf-gtksourceview" "camlzip" "ocamlgraph" "coq"
+  "lablgtk" "conf-gtksourceview" "camlzip" "ocamlgraph"
 ]
 conflicts: [
   "lablgtk" {< "2.14.2"}
