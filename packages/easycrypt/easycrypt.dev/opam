@@ -11,7 +11,7 @@ remove: [
   [make "PREFIX=%{prefix}%" "uninstall-purge"]
 ]
 depends: [
-  "ec-toolchain"
+  "ec-toolchain" {= "20160212"}
   "ocamlbuild"
 ]
 depopts: [
